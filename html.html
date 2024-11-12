@@ -103,13 +103,8 @@
     </div>
     <div class="content">
       <div class="card">
-        <h2 class="pressure">Luftdruck: <span id="pressure">0.0</span> hPa</h2>
-        <h2 class="altitude">H&ouml;he: <span id="altitude">0.0</span> m</h2>
-        <h2 class="temperature">Temperatur: <span id="temperature">0.0</span> &deg;C</h2>
-        <h2 class="gas">Gas: <span id="gas">0.0</span> mL</h2>
-        <h2 class="date_time_ISO8601">
-          DataTime: <span id="date_time_ISO8601">1970-01-01T00:00:00Z</span>
-        </h2>
+        <h2 class="mm">Distanz: <span id="mm">0.0</span> mm</h2>
+        <h2 class="millis">Millis: <span id="millis">0.0</span> ms</h2>
         <p class="state">state: <span id="state">no recording...</span></p>
         <p><button id="Startbutton" class="button">Start</button></p>
         <p>
@@ -166,17 +161,11 @@
           }
         } else if (data.date_time) {
           showToast("Clock successfully updated!", 2000);
-        } else if (data.altitude) {
-          document.getElementById("temperature").innerHTML =
-            data.temperature.toFixed(2);
-          document.getElementById("altitude").innerHTML =
-            data.altitude.toFixed(2);
-          document.getElementById("pressure").innerHTML =
-            data.pressure.toFixed(2);
-          document.getElementById("gas").innerHTML =
-            data.gas.toFixed(2);
-          document.getElementById("date_time_ISO8601").innerHTML =
-            data.date_time_ISO8601;
+        } else if (data.mm) {
+          document.getElementById("mm").innerHTML =
+            data.mm;
+          document.getElementById("millis").innerHTML =
+            data.millis;
         } else if (data.freespace) {
           let info_text =
             "File: " +

@@ -4,16 +4,8 @@
 
 struct SensorData
 {
-    float pressure;
-    float altitude;
-    float temperature;
-    float gas;
-    uint8_t hour;
-    uint8_t minute;
-    uint8_t second;
-    uint8_t day;
-    uint8_t month;
-    uint16_t year;
+    int mm;
+    long millis;
 };
 
 struct FileData

@@ -20,7 +20,7 @@ String getJSON(const SensorData &data)
 {
     char buffer[255];
     // Format the date and time into ISO 8601 format
-    snprintf(buffer, sizeof(buffer), "{\"altitude\": %0.2f, \"pressure\": %0.2f, \"temperature\": %0.2f, \"gas\": %0.2f, \"date_time_ISO8601\": \"%s\"}", data.altitude, data.pressure, data.temperature, data.gas, formatISO8601(data.year, data.month, data.day, data.hour, data.minute, data.second).c_str());
+    snprintf(buffer, sizeof(buffer), "{\"mm\": %d, \"millis\": %d}", data.mm, data.millis);
     return String(buffer);
 }
 
@@ -34,5 +34,5 @@ String getJSON(const FileData &data)
 
 String getFirstCSVLine()
 {
-    return "altitude;pressure;temperature;gas;date_time";
+    return "mm;millis";
 }

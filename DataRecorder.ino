@@ -1,10 +1,10 @@
-/*
 #include <ESP8266WiFi.h>
 #include <DNSServer.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <ArduinoJson.h>
 #include <Wire.h>
+#include <VL53L0X.h>
 
 #include <LittleFS.h>
 #include <stdio.h>
@@ -24,12 +24,15 @@ constexpr const auto DNS_PORT = 53;
 constexpr const char *DATA_FILENAME = "data.csv";
 constexpr const char *BASE_SSID = "DataRecorder";
 
-constexpr const long interval1 = 500;
-constexpr const long interval2 = 1000;
+constexpr const long interval1 = 100;
+constexpr const long interval2 = 200;
+constexpr const int counter = 5;
+
 
 unsigned long previousMillis1 = 0; // Stores the last time an event occurred
 unsigned long previousMillis2 = 0; // Stores the last time an event occurred
 
+VL53L0X sensor;
 
 DNSServer dnsServer;
 AsyncWebServer server(80);
@@ -56,36 +59,48 @@ void setup()
   initAccessPoint(IPAddress(10, 10, 10, 10), IPAddress(10, 10, 10, 10), IPAddress(255, 255, 255, 0), BASE_SSID);
   initWebServerWithSocket();
 
-  initDistanceSensor(sensor);
+  Wire.begin();
+  sensor.setTimeout(500);
+  if (!sensor.init())
+  {
+    Serial.println("Failed to detect and initialize sensor!");
+    while (1) {}
+  }
+  // reduce timing budget to 20 ms (default is about 33 ms)
+  sensor.setMeasurementTimingBudget(20000);
+  Serial.println("Sensor initialized...");
+  Serial.print("Sensor Address: ");
+  Serial.print(sensor.getAddress());
 }
 
 void loop()
 {
   unsigned long currentMillis = millis();
   SensorData data;
-  // Task 1 -> every 500ms
+  // Task 1 -> every 100ms
   if (currentMillis - previousMillis1 >= interval1)
   {
     // Save the last time task 1 was executed
     previousMillis1 = currentMillis;
 
     // Perform task 1
-    auto data = collectData();
-    sendDataToClient(data);
+    data = collectData();
+    if (appState.dataRecording)
+    {
+      auto file_data = storeData(data, appState); 
+      sendDataToClient(file_data);
+    }
   }
 
-  // Task 2 -> every 1000ms
+  // Task 2 -> every 200ms
   if (currentMillis - previousMillis2 >= interval2)
   {
     // Save the last time task 2 was executed
     previousMillis2 = currentMillis;
 
     // Perform task 2
-    if (appState.dataRecording)
-    {
-      auto file_data = storeData(data, appState);
-      sendDataToClient(file_data);
-    }
+    sendDataToClient(data);
+    Serial.println("Distance: " + String(data.mm) + " mm");
   }
 }
 
@@ -93,7 +108,8 @@ void loop()
 SensorData collectData()
 {
   SensorData data = {};
-  data.temperature = getDistanceMillimeters(sensor);
+  data.mm = sensor.readRangeSingleMillimeters();
+  data.millis = millis();
   return data;
 }
 
@@ -207,7 +223,7 @@ FileData storeData(const SensorData &data, const ApplicationState &appState)
   digitalWrite(LED_BUILTIN, HIGH);
   char buffer[255];
   // Format the date and time into ISO 8601 format
-  snprintf(buffer, sizeof(buffer), "%0.2f;%0.2f;%0.2f;%0.2f;%s;", data.altitude, data.pressure, data.temperature, data.gas, formatISO8601(data.year, data.month, data.day, data.hour, data.minute, data.second).c_str());
+  snprintf(buffer, sizeof(buffer), "%d;%d;", data.mm, data.millis);
   file_data.filesize = appendFile(DATA_FILENAME, buffer);
   file_data.free_space = getAvalibleDiskSpace();
   // readFile(DATA_FILENAME); //just for debug purpose...
@@ -233,7 +249,7 @@ void initAccessPoint(const IPAddress &localIP, const IPAddress &gatewayIP, const
   Serial.printf("SSID: %s\n", custom_ssid.c_str());
   WiFi.softAP(custom_ssid);
 }
-*/
+
 /* This example shows how to get single-shot range
  measurements from the VL53L0X. The sensor can optionally be
  configured with different ranging profiles, as described in
@@ -241,7 +257,7 @@ void initAccessPoint(const IPAddress &localIP, const IPAddress &gatewayIP, const
  a certain application. This code is based on the four
  "SingleRanging" examples in the VL53L0X API.
 
- The range readings are in units of mm. */
+ The range readings are in units of mm. 
 
 #include <Wire.h>
 #include <VL53L0X.h>
@@ -303,3 +319,4 @@ void loop()
 
   Serial.println();
 }
+*/
