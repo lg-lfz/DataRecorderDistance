@@ -17,6 +17,8 @@
 #include "file.h"
 #include "html.h"
 
+constexpr const auto SENSOR_OFFSET = 0; //this offset will be deducted from the sensor value
+
 constexpr const auto SCL_PIN = D1;
 constexpr const auto SDA_PIN = D2;
 
@@ -108,7 +110,8 @@ void loop()
 SensorData collectData()
 {
   SensorData data = {};
-  data.mm = sensor.readRangeSingleMillimeters();
+  auto value = sensor.readRangeSingleMillimeters();
+  data.mm = value - SENSOR_OFFSET;
   data.millis = millis();
   return data;
 }

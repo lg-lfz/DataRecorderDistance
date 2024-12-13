@@ -3,7 +3,7 @@
 void initDistanceSensor(VL53L0X& sensor) {
   Wire.begin();
   sensor.init();
-  sensor.setMeasurementTimingBudget(200000);
+  sensor.setMeasurementTimingBudget(200000); // 200ms timing budget (default is 33ms)
   sensor.setTimeout(500);
   Serial.println("VL53L0X-Sensor bereit!");
   Serial.print("Address: ");

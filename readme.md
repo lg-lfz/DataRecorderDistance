@@ -25,6 +25,8 @@ https://www.st.com/en/imaging-and-photonics-solutions/vl6180x.html
 
 https://www.st.com/en/imaging-and-photonics-solutions/time-of-flight-sensors/products.html
 
+https://github.com/pololu/vl53l0x-arduino
+
 [Driver Repository on Github](https://github.com/pololu/vl53l0x-arduino)
 
 # Libs
